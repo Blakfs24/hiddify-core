@@ -145,7 +145,7 @@ func patchOutbound(base option.Outbound, configOpt ConfigOptions, staticIpsDns m
 	if err != nil {
 		return nil, "", formatErr(err)
 	}
-
+	// fmt.Println(string(jsonData))
 	var obj outboundMap
 	err = json.Unmarshal(jsonData, &obj)
 	if err != nil {
@@ -155,6 +155,12 @@ func patchOutbound(base option.Outbound, configOpt ConfigOptions, staticIpsDns m
 	if server, ok := obj["server"].(string); ok {
 		if server != "" && net.ParseIP(server) == nil {
 			serverDomain = fmt.Sprintf("full:%s", server)
+		}
+		if configOpt.CloudFlareOptions.EnableCloudFlare && IsIPInCloudflareRanges(server) && len(configOpt.CloudFlareOptions.CloudFlareIPs) > 0 {
+			obj["server"] = RandomSelect(configOpt.CloudFlareOptions.CloudFlareIPs, 1)[0]
+		}
+		if configOpt.XrayOptions.EnableXrayCore {
+			obj = patchXragConfig(base, configOpt, obj)
 		}
 	}
 

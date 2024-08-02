@@ -1,10 +1,9 @@
 module github.com/hiddify/hiddify-core
 
-go 1.22.0
-
-toolchain go1.22.3
+go 1.22.5
 
 require (
+	github.com/XIU2/CloudflareSpeedTest v1.5.1
 	github.com/bepass-org/warp-plus v0.0.0-00010101000000-000000000000
 	github.com/golang/protobuf v1.5.4
 	github.com/kardianos/service v1.2.2
@@ -12,7 +11,7 @@ require (
 	github.com/sagernet/sing v0.4.1
 	github.com/sagernet/sing-box v1.8.9
 	github.com/sagernet/sing-dns v0.2.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/xmdhs/clash2singbox v0.0.2
 	golang.org/x/sys v0.22.0
 	google.golang.org/grpc v1.65.0
@@ -22,12 +21,15 @@ require (
 
 require (
 	berty.tech/go-libtor v1.0.385 // indirect
+	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/caddyserver/certmagic v0.20.0 // indirect
+	github.com/cheggaaa/pb/v3 v3.1.5 // indirect
 	github.com/cloudflare/circl v1.3.9 // indirect
 	github.com/cretz/bine v0.2.0 // indirect
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gaukas/godicttls v0.0.4 // indirect
@@ -55,6 +57,9 @@ require (
 	github.com/libdns/cloudflare v0.1.1 // indirect
 	github.com/libdns/libdns v0.2.2 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mholt/acmez v1.2.0 // indirect
 	github.com/miekg/dns v1.1.61 // indirect
 	github.com/onsi/ginkgo/v2 v2.19.0 // indirect
@@ -75,6 +80,7 @@ require (
 	github.com/quic-go/quic-go v0.45.1 // indirect
 	github.com/refraction-networking/utls v1.6.7 // indirect
 	github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sagernet/bbolt v0.0.0-20231014093535-ea5cb2fe9f0a // indirect
 	github.com/sagernet/cloudflare-tls v0.0.0-20231208171750-a4483c1b7cd1 // indirect
 	github.com/sagernet/gvisor v0.0.0-20240428053021-e691de28565f // indirect
@@ -127,3 +133,5 @@ replace github.com/sagernet/wireguard-go => github.com/hiddify/wireguard-go v0.0
 replace github.com/bepass-org/warp-plus => github.com/hiddify/warp-plus v0.0.0-20240717223357-4f3122e0d11d
 
 replace github.com/hiddify/ray2sing => github.com/hiddify/ray2sing v0.0.0-20240802071553-e5ba91dc16e6
+
+replace github.com/XIU2/CloudflareSpeedTest => github.com/Blakfs24/CloudflareSpeedTest v0.0.0-20240802104646-d096ac1c2c54

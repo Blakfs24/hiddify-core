@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/hiddify/hiddify-core/cf"
 	"github.com/sagernet/sing-box/option"
 	dns "github.com/sagernet/sing-dns"
 )
@@ -24,6 +25,8 @@ type ConfigOptions struct {
 	InboundOptions
 	URLTestOptions
 	RouteOptions
+	cf.CloudFlareOptions
+	XrayOptions
 }
 
 type DNSOptions struct {
@@ -59,6 +62,14 @@ type RouteOptions struct {
 	IPv6Mode               option.DomainStrategy `json:"ipv6-mode"`
 	BypassLAN              bool                  `json:"bypass-lan"`
 	AllowConnectionFromLAN bool                  `json:"allow-connection-from-lan"`
+}
+
+// this option is for xray, which would convert the type name of vless, trojan, vmess to xvless, xtrojan, xvmess
+type XrayOptions struct {
+	EnableXrayCore bool `json:"enable-xray-core"`
+	EnableVless    bool `json:"enable-vless"`
+	EnableTrojan   bool `json:"enable-trojan"`
+	EnableVmess    bool `json:"enable-vmess"`
 }
 
 type TLSTricks struct {
