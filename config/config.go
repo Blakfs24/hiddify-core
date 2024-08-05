@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hiddify/hiddify-core/cf"
+	cf "github.com/hiddify/hiddify-core/CFScanner"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
 	dns "github.com/sagernet/sing-dns"
@@ -421,6 +421,16 @@ func BuildConfig(opt ConfigOptions, input option.Options) (*option.Options, erro
 				},
 			},
 		)
+		options.DNS.Rules = append(
+			options.DNS.Rules,
+			option.DNSRule{
+				Type: C.RuleTypeDefault,
+				DefaultOptions: option.DefaultDNSRule{
+					DomainSuffix: []string{"." + opt.Region},
+					Server:       DNSDirectTag,
+				},
+			},
+		)
 		options.Route.RuleSet = append(options.Route.RuleSet, option.RuleSet{
 			Type:   C.RuleSetTypeRemote,
 			Tag:    "geoip-" + opt.Region,
@@ -451,8 +461,15 @@ func BuildConfig(opt ConfigOptions, input option.Options) (*option.Options, erro
 				Outbound: OutboundDirectTag,
 			},
 		}
-
 		options.Route.Rules = append([]option.Rule{routeRuleIp}, options.Route.Rules...)
+		routeRuleLocalDomain := option.Rule{
+			Type: C.RuleTypeDefault,
+			DefaultOptions: option.DefaultRule{
+				Domain:   []string{"." + opt.Region},
+				Outbound: OutboundDirectTag,
+			},
+		}
+		options.Route.Rules = append([]option.Rule{routeRuleLocalDomain}, options.Route.Rules...)
 	}
 	if opt.BlockAds {
 		options.Route.RuleSet = append(options.Route.RuleSet, option.RuleSet{

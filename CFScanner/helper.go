@@ -1,14 +1,10 @@
-package config
+package CFScanner
 
 import (
-	"fmt"
 	"math/rand"
 	"net"
 	"sort"
 	"time"
-
-	C "github.com/sagernet/sing-box/constant"
-	"github.com/sagernet/sing-box/option"
 )
 
 // CloudflareIPRanges 存储Cloudflare的IP地址段
@@ -79,11 +75,6 @@ func IsIPInCloudflareRanges(ipStr string) bool {
 	return false
 }
 
-func patchCloudflare(base *option.Outbound, configOpt *ConfigOptions) error {
-	fmt.Println(base.SocksOptions.Server, " ", base.Tag)
-	return nil
-}
-
 func RandomSelect[T any](list []T, n int) []T {
 	if n >= len(list) {
 		return list
@@ -98,17 +89,4 @@ func RandomSelect[T any](list []T, n int) []T {
 		copiedList[i], copiedList[j] = copiedList[j], copiedList[i]
 	}
 	return copiedList[:n]
-}
-
-func patchXragConfig(base option.Outbound, configOpt ConfigOptions, obj outboundMap) outboundMap {
-	if base.Type == C.TypeVLESS && configOpt.XrayOptions.EnableVless {
-		obj["type"] = "xvless"
-	}
-	if base.Type == C.TypeVMess && configOpt.XrayOptions.EnableVmess {
-		obj["type"] = "xvmess"
-	}
-	if base.Type == C.TypeTrojan && configOpt.XrayOptions.EnableTrojan {
-		obj["type"] = "xtrojan"
-	}
-	return obj
 }

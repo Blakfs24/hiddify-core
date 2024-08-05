@@ -3,7 +3,6 @@ module github.com/hiddify/hiddify-core
 go 1.22.5
 
 require (
-	github.com/XIU2/CloudflareSpeedTest v1.5.1
 	github.com/bepass-org/warp-plus v0.0.0-00010101000000-000000000000
 	github.com/golang/protobuf v1.5.4
 	github.com/kardianos/service v1.2.2
@@ -25,7 +24,7 @@ require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/caddyserver/certmagic v0.20.0 // indirect
-	github.com/cheggaaa/pb/v3 v3.1.5 // indirect
+	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/cloudflare/circl v1.3.9 // indirect
 	github.com/cretz/bine v0.2.0 // indirect
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
@@ -133,5 +132,3 @@ replace github.com/sagernet/wireguard-go => github.com/hiddify/wireguard-go v0.0
 replace github.com/bepass-org/warp-plus => github.com/hiddify/warp-plus v0.0.0-20240717223357-4f3122e0d11d
 
 replace github.com/hiddify/ray2sing => github.com/hiddify/ray2sing v0.0.0-20240802071553-e5ba91dc16e6
-
-replace github.com/XIU2/CloudflareSpeedTest => github.com/Blakfs24/CloudflareSpeedTest v0.0.0-20240802104646-d096ac1c2c54
