@@ -39,7 +39,7 @@ func NewPing() *Ping {
 		ips:     ips,
 		csv:     make(PingDelaySet, 0),
 		control: make(chan bool, Routines),
-		bar:     NewBar(len(ips), "可用:", ""),
+		bar:     NewBar(len(ips), "Available:", ""),
 	}
 }
 

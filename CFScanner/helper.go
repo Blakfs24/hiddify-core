@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// CloudflareIPRanges 存储Cloudflare的IP地址段
+// CloudflareIPRanges stores the IP address ranges of Cloudflare
 var CloudflareIPRanges = []string{
 	"173.245.48.0/20",
 	"103.21.244.0/22",
@@ -26,13 +26,13 @@ var CloudflareIPRanges = []string{
 	"131.0.72.0/22",
 }
 
-// IPToUint32 将IP地址转换为32位无符号整数
+// IPToUint32 converts an IP address to a 32-bit unsigned integer
 func IPToUint32(ip net.IP) uint32 {
 	ip = ip.To4()
 	return uint32(ip[0])<<24 | uint32(ip[1])<<16 | uint32(ip[2])<<8 | uint32(ip[3])
 }
 
-// CIDRToRange 将CIDR表示的IP地址段转换为起始和结束IP的32位无符号整数表示
+// CIDRToRange converts a CIDR representation of an IP address range to the start and end IP in 32-bit unsigned integer representation
 func CIDRToRange(cidr string) (uint32, uint32, error) {
 	_, ipnet, err := net.ParseCIDR(cidr)
 	if err != nil {
@@ -44,7 +44,7 @@ func CIDRToRange(cidr string) (uint32, uint32, error) {
 	return startIP, endIP, nil
 }
 
-// IsIPInCloudflareRanges 检查IP地址是否在Cloudflare的IP地址段中
+// IsIPInCloudflareRanges checks if an IP address is in the Cloudflare IP address ranges
 func IsIPInCloudflareRanges(ipStr string) bool {
 	ip := net.ParseIP(ipStr)
 	if ip == nil {

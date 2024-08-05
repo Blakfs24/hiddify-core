@@ -16,14 +16,14 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 		Timeout: time.Second * 2,
 		Transport: &http.Transport{
 			DialContext: getDialContext(ip),
-			//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // 跳过证书验证
+			//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // Skip certificate verification
 		},
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse // 阻止重定向
+			return http.ErrUseLastResponse // Prevent redirection
 		},
 	}
 
-	// 先访问一次获得 HTTP 状态码 及 Cloudflare Colo
+	// Access once to get the HTTP status code and Cloudflare Colo
 	{
 		requ, err := http.NewRequest(http.MethodHead, URL, nil)
 		if err != nil {
@@ -37,8 +37,8 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 		defer resp.Body.Close()
 
 		//fmt.Println("IP:", ip, "StatusCode:", resp.StatusCode, resp.Request.URL)
-		// 如果未指定的 HTTP 状态码，或指定的状态码不合规，则默认只认为 200、301、302 才算 HTTPing 通过
-		if HttpingStatusCode == 0 || HttpingStatusCode < 100 && HttpingStatusCode > 599 {
+		// If no HTTP status code is specified or the specified status code is invalid, only consider 200, 301, and 302 as successful HTTPing
+		if HttpingStatusCode == 0 || (HttpingStatusCode < 100 && HttpingStatusCode > 599) {
 			if resp.StatusCode != 200 && resp.StatusCode != 301 && resp.StatusCode != 302 {
 				return 0, 0
 			}
@@ -50,30 +50,30 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 
 		io.Copy(io.Discard, resp.Body)
 
-		// 只有指定了地区才匹配机场三字码
+		// Match airport code only if the region is specified
 		if HttpingCFColo != "" {
-			// 通过头部 Server 值判断是 Cloudflare 还是 AWS CloudFront 并设置 cfRay 为各自的机场三字码完整内容
+			// Determine whether it is Cloudflare or AWS CloudFront based on the Server header value and set cfRay to their respective airport code
 			cfRay := func() string {
 				if resp.Header.Get("Server") == "cloudflare" {
-					return resp.Header.Get("CF-RAY") // 示例 cf-ray: 7bd32409eda7b020-SJC
+					return resp.Header.Get("CF-RAY") // Example cf-ray: 7bd32409eda7b020-SJC
 				}
-				return resp.Header.Get("x-amz-cf-pop") // 示例 X-Amz-Cf-Pop: SIN52-P1
+				return resp.Header.Get("x-amz-cf-pop") // Example X-Amz-Cf-Pop: SIN52-P1
 			}()
 			colo := p.getColo(cfRay)
-			if colo == "" { // 没有匹配到三字码或不符合指定地区则直接结束该 IP 测试
+			if colo == "" { // If no matching airport code or does not match the specified region, end the IP test directly
 				return 0, 0
 			}
 		}
 
 	}
 
-	// 循环测速计算延迟
+	// Loop to calculate latency
 	success := 0
 	var delay time.Duration
 	for i := 0; i < PingTimes; i++ {
 		requ, err := http.NewRequest(http.MethodHead, URL, nil)
 		if err != nil {
-			log.Fatal("意外的错误，情报告：", err)
+			log.Fatal("Unexpected error, please report:", err)
 			return 0, 0
 		}
 		requ.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36")
@@ -101,7 +101,7 @@ func MapColoMap() *sync.Map {
 	if HttpingCFColo == "" {
 		return nil
 	}
-	// 将参数指定的地区三字码转为大写并格式化
+	// Convert the specified region codes to uppercase and format them
 	colos := strings.Split(strings.ToUpper(HttpingCFColo), ",")
 	colomap := &sync.Map{}
 	for _, colo := range colos {
@@ -114,13 +114,13 @@ func (p *Ping) getColo(b string) string {
 	if b == "" {
 		return ""
 	}
-	// 正则匹配并返回 机场三字码
+	// Match and return the airport code using regular expressions
 	out := OutRegexp.FindString(b)
 
 	if HttpingCFColomap == nil {
 		return out
 	}
-	// 匹配 机场三字码 是否为指定的地区
+	// Match whether the airport code is in the specified region
 	_, ok := HttpingCFColomap.Load(out)
 	if ok {
 		return out
