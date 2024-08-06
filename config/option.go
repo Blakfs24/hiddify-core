@@ -126,6 +126,7 @@ func DefaultConfigOptions() *ConfigOptions {
 			AllowConnectionFromLAN: false,
 		},
 		LogLevel:       "warn",
+		Region:         "other",
 		EnableClashApi: true,
 		ClashApiPort:   6756,
 		ClashApiSecret: "",
