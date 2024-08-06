@@ -3,7 +3,6 @@ module github.com/hiddify/hiddify-core
 go 1.22.5
 
 require (
-	github.com/XIU2/CloudflareSpeedTest v1.5.1
 	github.com/bepass-org/warp-plus v0.0.0-00010101000000-000000000000
 	github.com/golang/protobuf v1.5.4
 	github.com/kardianos/service v1.2.2
@@ -19,13 +18,15 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
+require github.com/akavel/rsrc v0.10.2 // indirect
+
 require (
 	berty.tech/go-libtor v1.0.385 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/caddyserver/certmagic v0.20.0 // indirect
-	github.com/cheggaaa/pb/v3 v3.1.5 // indirect
+	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/cloudflare/circl v1.3.9 // indirect
 	github.com/cretz/bine v0.2.0 // indirect
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
@@ -46,7 +47,7 @@ require (
 	github.com/google/pprof v0.0.0-20240528025155-186aa0362fba // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
-	github.com/hiddify/ray2sing v0.0.0-20240802071553-e5ba91dc16e6
+	github.com/hiddify/ray2sing v0.0.0-20240804185422-f340989b59a0
 	github.com/imkira/go-observer/v2 v2.0.0-20230629064422-8e0b61f11f1b // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20231206064809-8c70d406f6d2 // indirect
@@ -132,6 +133,4 @@ replace github.com/sagernet/wireguard-go => github.com/hiddify/wireguard-go v0.0
 
 replace github.com/bepass-org/warp-plus => github.com/hiddify/warp-plus v0.0.0-20240717223357-4f3122e0d11d
 
-replace github.com/hiddify/ray2sing => github.com/hiddify/ray2sing v0.0.0-20240802071553-e5ba91dc16e6
-
-replace github.com/XIU2/CloudflareSpeedTest => github.com/Blakfs24/CloudflareSpeedTest v0.0.0-20240802104646-d096ac1c2c54
+// replace github.com/hiddify/ray2sing => github.com/hiddify/ray2sing v0.0.0-20240802071553-e5ba91dc16e6
