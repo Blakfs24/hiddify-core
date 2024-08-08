@@ -18,8 +18,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require github.com/akavel/rsrc v0.10.2 // indirect
-
 require (
 	berty.tech/go-libtor v1.0.385 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
@@ -125,7 +123,7 @@ require (
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
-replace github.com/sagernet/sing-box => github.com/hiddify/hiddify-sing-box v1.8.9-0.20240802064124-d8fa585fd411
+replace github.com/sagernet/sing-box => github.com/hiddify/hiddify-sing-box v1.8.9-0.20240806200952-27c0edc27161
 
 replace github.com/xtls/xray-core => github.com/hiddify/xray-core v0.0.0-20240729110224-c3df022f042a
 
@@ -133,4 +131,4 @@ replace github.com/sagernet/wireguard-go => github.com/hiddify/wireguard-go v0.0
 
 replace github.com/bepass-org/warp-plus => github.com/hiddify/warp-plus v0.0.0-20240717223357-4f3122e0d11d
 
-// replace github.com/hiddify/ray2sing => github.com/hiddify/ray2sing v0.0.0-20240802071553-e5ba91dc16e6
+replace github.com/hiddify/ray2sing => github.com/hiddify/ray2sing v0.0.0-20240807031953-a9df25615108

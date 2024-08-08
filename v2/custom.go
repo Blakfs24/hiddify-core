@@ -87,7 +87,7 @@ func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	}
 	Log(pb.LogLevel_DEBUG, pb.LogType_CORE, "Parsing Config")
 
-	parsedContent, err := parseConfig(content)
+	parsedContent, err := readOptions(content)
 	Log(pb.LogLevel_DEBUG, pb.LogType_CORE, "Parsed")
 
 	if err != nil {
@@ -175,7 +175,7 @@ func Parse(in *pb.ParseRequest) (*pb.ParseResponse, error) {
 
 	}
 
-	config, err := config.ParseConfigContent(content, true, nil, false)
+	config, err := config.ParseConfigContent(content, true, configOptions, false)
 	if err != nil {
 		return &pb.ParseResponse{
 			ResponseCode: pb.ResponseCode_FAILED,
@@ -247,7 +247,7 @@ func generateConfigFromFile(path string, configOpt config.ConfigOptions) (string
 	if err != nil {
 		return "", err
 	}
-	options, err := parseConfig(string(content))
+	options, err := readOptions(string(content))
 	if err != nil {
 		return "", err
 	}

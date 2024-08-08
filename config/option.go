@@ -7,13 +7,14 @@ import (
 )
 
 type ConfigOptions struct {
-	EnableFullConfig bool   `json:"enable-full-config"`
-	LogLevel         string `json:"log-level"`
-	EnableClashApi   bool   `json:"enable-clash-api"`
-	ClashApiPort     uint16 `json:"clash-api-port"`
-	ClashApiSecret   string `json:"web-secret"`
-	Region           string `json:"region"`
-	BlockAds         bool   `json:"block-ads"`
+	EnableFullConfig        bool   `json:"enable-full-config"`
+	LogLevel                string `json:"log-level"`
+	EnableClashApi          bool   `json:"enable-clash-api"`
+	ClashApiPort            uint16 `json:"clash-api-port"`
+	ClashApiSecret          string `json:"web-secret"`
+	Region                  string `json:"region"`
+	BlockAds                bool   `json:"block-ads"`
+	UseXrayCoreWhenPossible bool   `json:"use-xray-core-when-possible"`
 	// GeoIPPath        string      `json:"geoip-path"`
 	// GeoSitePath      string      `json:"geosite-path"`
 	Rules     []Rule      `json:"rules"`
@@ -147,5 +148,6 @@ func DefaultConfigOptions() *ConfigOptions {
 			EnablePadding:  false,
 			PaddingSize:    "1200-1500",
 		},
+		UseXrayCoreWhenPossible: false,
 	}
 }
