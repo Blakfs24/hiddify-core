@@ -41,7 +41,7 @@ const (
 
 // Variables linked to default constants
 var (
-	InputMaxDelay     = time.Duration(9999) * time.Millisecond // Maximum delay allowed
+	InputMaxDelay     = time.Duration(1000) * time.Millisecond // Maximum delay allowed
 	InputMinDelay     = time.Duration(0) * time.Millisecond    // Minimum delay allowed
 	InputMaxLossRate  = float32(1.0)                           // Maximum loss rate allowed
 	Timeout           = time.Duration(10) * time.Second        // Default timeout for requests
@@ -67,7 +67,7 @@ var (
 )
 
 type CloudFlareOptions struct {
-	EnableCloudFlare bool `json:"enable-cloudflare"`
+	EnableCloudFlare bool `json:"enable-cloud-flare"`
 	CloudFlareIPNum  int  `json:"cloudflare-ip-num"`
 	CloudFlareIPs    []string
 }
