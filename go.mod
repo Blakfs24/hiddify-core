@@ -7,9 +7,9 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/kardianos/service v1.2.2
 	github.com/sagernet/gomobile v0.1.3
-	github.com/sagernet/sing v0.4.1
+	github.com/sagernet/sing v0.4.2
 	github.com/sagernet/sing-box v1.8.9
-	github.com/sagernet/sing-dns v0.2.0
+	github.com/sagernet/sing-dns v0.2.3
 	github.com/spf13/cobra v1.8.1
 	github.com/xmdhs/clash2singbox v0.0.2
 	golang.org/x/sys v0.22.0
@@ -20,7 +20,7 @@ require (
 
 require (
 	berty.tech/go-libtor v1.0.385 // indirect
-	github.com/VividCortex/ewma v1.2.0 // indirect
+	github.com/VividCortex/ewma v1.2.0
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/caddyserver/certmagic v0.20.0 // indirect
@@ -84,15 +84,15 @@ require (
 	github.com/sagernet/cloudflare-tls v0.0.0-20231208171750-a4483c1b7cd1 // indirect
 	github.com/sagernet/gvisor v0.0.0-20240428053021-e691de28565f // indirect
 	github.com/sagernet/netlink v0.0.0-20240523065131-45e60152f9ba // indirect
-	github.com/sagernet/quic-go v0.43.1-beta.2 // indirect
+	github.com/sagernet/quic-go v0.46.0-beta.4 // indirect
 	github.com/sagernet/reality v0.0.0-20230406110435-ee17307e7691 // indirect
 	github.com/sagernet/sing-mux v0.2.0 // indirect
-	github.com/sagernet/sing-quic v0.2.0-beta.5 // indirect
+	github.com/sagernet/sing-quic v0.2.2 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.7 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 // indirect
 	github.com/sagernet/sing-shadowtls v0.1.4 // indirect
 	github.com/sagernet/sing-tun v0.3.2 // indirect
-	github.com/sagernet/sing-vmess v0.1.8 // indirect
+	github.com/sagernet/sing-vmess v0.1.12 // indirect
 	github.com/sagernet/smux v0.0.0-20231208180855-7041f6ea79e7 // indirect
 	github.com/sagernet/tfo-go v0.0.0-20231209031829-7b5343ac1dc6 // indirect
 	github.com/sagernet/utls v1.5.4 // indirect
@@ -123,7 +123,7 @@ require (
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
-replace github.com/sagernet/sing-box => github.com/hiddify/hiddify-sing-box v1.8.9-0.20240806200952-27c0edc27161
+replace github.com/sagernet/sing-box => github.com/Blakfs24/hiddify-sing-box v0.0.0-20240819074413-7bbbae386ff6
 
 replace github.com/xtls/xray-core => github.com/hiddify/xray-core v0.0.0-20240729110224-c3df022f042a
 
