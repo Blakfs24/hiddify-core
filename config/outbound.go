@@ -6,13 +6,14 @@ import (
 	"net"
 
 	cf "github.com/hiddify/hiddify-core/CFScanner"
+	"github.com/hiddify/ray2sing/ray2sing"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
 )
 
-type outboundMap map[string]interface{}
+// type map[string]any map[string]interface{}
 
-func patchOutboundMux(base option.Outbound, configOpt ConfigOptions, obj outboundMap) outboundMap {
+func patchOutboundMux(base option.Outbound, configOpt ConfigOptions, obj map[string]any) map[string]any {
 	if configOpt.Mux.Enable {
 		multiplex := option.OutboundMultiplexOptions{
 			Enabled:    true,
@@ -27,7 +28,7 @@ func patchOutboundMux(base option.Outbound, configOpt ConfigOptions, obj outboun
 	return obj
 }
 
-func patchOutboundTLSTricks(base option.Outbound, configOpt ConfigOptions, obj outboundMap) outboundMap {
+func patchOutboundTLSTricks(base option.Outbound, configOpt ConfigOptions, obj map[string]any) map[string]any {
 
 	if base.Type == C.TypeSelector || base.Type == C.TypeURLTest || base.Type == C.TypeBlock || base.Type == C.TypeDNS {
 		return obj
@@ -101,7 +102,7 @@ func patchOutboundTLSTricks(base option.Outbound, configOpt ConfigOptions, obj o
 	return obj
 }
 
-func patchOutboundFragment(base option.Outbound, configOpt ConfigOptions, obj outboundMap) outboundMap {
+func patchOutboundFragment(base option.Outbound, configOpt ConfigOptions, obj map[string]any) map[string]any {
 	if configOpt.TLSTricks.EnableFragment {
 		obj["tcp_fast_open"] = false
 		obj["tls_fragment"] = option.TLSFragmentOptions{
@@ -147,7 +148,7 @@ func patchOutbound(base option.Outbound, configOpt ConfigOptions, staticIpsDns m
 		return nil, "", formatErr(err)
 	}
 	// fmt.Println(string(jsonData))
-	var obj outboundMap
+	var obj map[string]any
 	err = json.Unmarshal(jsonData, &obj)
 	if err != nil {
 		return nil, "", formatErr(err)
@@ -169,7 +170,26 @@ func patchOutbound(base option.Outbound, configOpt ConfigOptions, staticIpsDns m
 		obj = patchOutboundMux(base, configOpt, obj)
 	}
 
+	if obj["type"] == "vless" {
+		tmp, _ := ray2sing.Singbox2XrayVless(obj)
+		// fmt.Println("tmp:", tmp)
+		jsonData, err := tmp.MarshalJSON()
+		if err != nil {
+			fmt.Println("err:", err)
+			return nil, "", formatErr(err)
+		}
+		var xrayobj map[string]any
+		err = json.Unmarshal(jsonData, &xrayobj)
+		var outbounds option.Outbound
+		err2 := outbounds.UnmarshalJSON(jsonData)
+		// fmt.Println("obj:", string(jsonData))
+		if err == nil && err2 == nil {
+			obj = xrayobj
+		}
+	}
+
 	modifiedJson, err := json.Marshal(obj)
+	fmt.Println("modifiedJson:", string(modifiedJson))
 	if err != nil {
 		return nil, "", formatErr(err)
 	}
@@ -182,7 +202,7 @@ func patchOutbound(base option.Outbound, configOpt ConfigOptions, staticIpsDns m
 	return &outbound, serverDomain, nil
 }
 
-// func (o outboundMap) transportType() string {
+// func (o map[string]any) transportType() string {
 // 	if transport, ok := o["transport"].(map[string]interface{}); ok {
 // 		if transportType, ok := transport["type"].(string); ok {
 // 			return transportType

@@ -11,6 +11,8 @@ dmitri.shuralyov.com/state v0.0.0-20180228185332-28bcc343414c/go.mod h1:0PRwlb0D
 git.apache.org/thrift.git v0.0.0-20180902110319-2566ecd5d999/go.mod h1:fPE2ZNJGynbRyZ4dJvy6G277gSllfV2HJqblrnkyeyg=
 github.com/Blakfs24/hiddify-sing-box v0.0.0-20240819074413-7bbbae386ff6 h1:jYq6peE8alz3Fca6LumyZDSAFX5IMEVQp2NwKUZvdP0=
 github.com/Blakfs24/hiddify-sing-box v0.0.0-20240819074413-7bbbae386ff6/go.mod h1:SyVXuXNXEC0GAHzNp67JghN8FCi9TNCjcoaAiNSFNcE=
+github.com/Blakfs24/ray2sing v0.0.0-20240820084518-faf37a4b2a2d h1:86w7AYlwXiWvteMWcl4LPJ2IRlZisMdeJuhHh3yDIgA=
+github.com/Blakfs24/ray2sing v0.0.0-20240820084518-faf37a4b2a2d/go.mod h1:Qp3mFdKsJZ5TwBYLREgWp8n2O6dgmNt3aAoX+xpvnsM=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/OmarTariq612/goech v0.0.0-20240405204721-8e2e1dafd3a0 h1:Wo41lDOevRJSGpevP+8Pk5bANX7fJacO2w04aqLiC5I=
 github.com/OmarTariq612/goech v0.0.0-20240405204721-8e2e1dafd3a0/go.mod h1:FVGavL/QEBQDcBpr3fAojoK17xX5k9bicBphrOpP7uM=
@@ -108,8 +110,6 @@ github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7/go.mod h1:Fecb
 github.com/grpc-ecosystem/grpc-gateway v1.5.0/go.mod h1:RSKVYQBd5MCa4OVpNdGskqpgL2+G+NZTnrVHpWWfpdw=
 github.com/hashicorp/yamux v0.1.1 h1:yrQxtgseBDrq9Y652vSRDvsKCJKOUD+GzTS4Y0Y8pvE=
 github.com/hashicorp/yamux v0.1.1/go.mod h1:CtWFDAQgb7dxtzFs4tWbplKIe2jSi3+5vKbgIO0SLnQ=
-github.com/hiddify/ray2sing v0.0.0-20240807031953-a9df25615108 h1:LuDOjwO9GwKAnxhMADCnQcjBTnEBp6JdsoPisf192Q4=
-github.com/hiddify/ray2sing v0.0.0-20240807031953-a9df25615108/go.mod h1:Qp3mFdKsJZ5TwBYLREgWp8n2O6dgmNt3aAoX+xpvnsM=
 github.com/hiddify/warp-plus v0.0.0-20240717223357-4f3122e0d11d h1:vRGKh9ou+/vQGfVYa8MczhbIVjHxlP52OWwrDWO77RA=
 github.com/hiddify/warp-plus v0.0.0-20240717223357-4f3122e0d11d/go.mod h1:uSRUbr1CcvFrEV69FTvuJFwpzEmwO8N4knb6+Zq3Ys4=
 github.com/hiddify/wireguard-go v0.0.0-20240727191222-383c1da14ff1 h1:xdbHlZtzs+jijAxy85qal835GglwmjohA/srHT8gm9s=
