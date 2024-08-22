@@ -273,7 +273,7 @@ func setOutbounds(options *option.Options, input *option.Options, opt *ConfigOpt
 
 func setClashAPI(options *option.Options, opt *ConfigOptions) {
 	if opt.EnableClashApi {
-		if opt.ClashApiSecret == "" {
+		if opt.ClashApiSecret == "random" {
 			opt.ClashApiSecret = generateRandomString(16)
 		}
 		options.Experimental = &option.ExperimentalOptions{
