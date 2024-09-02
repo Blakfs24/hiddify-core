@@ -4,12 +4,13 @@ go 1.22.5
 
 require (
 	github.com/bepass-org/warp-plus v0.0.0-00010101000000-000000000000
+	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/golang/protobuf v1.5.4
 	github.com/kardianos/service v1.2.2
 	github.com/sagernet/gomobile v0.1.3
 	github.com/sagernet/sing v0.4.2
 	github.com/sagernet/sing-box v1.8.9
-	github.com/sagernet/sing-dns v0.2.0
+	github.com/sagernet/sing-dns v0.2.3
 	github.com/spf13/cobra v1.8.0
 	github.com/xmdhs/clash2singbox v0.0.2
 	golang.org/x/sys v0.24.0
@@ -24,7 +25,7 @@ require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/caddyserver/certmagic v0.20.0 // indirect
-	github.com/cloudflare/circl v1.3.9 // indirect
+	github.com/cloudflare/circl v1.4.0 // indirect
 	github.com/cretz/bine v0.2.0 // indirect
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
 	github.com/fatih/color v1.16.0 // indirect
@@ -122,7 +123,7 @@ require (
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
-replace github.com/sagernet/sing-box => github.com/hiddify/hiddify-sing-box v1.8.9-0.20240806200952-27c0edc27161
+replace github.com/sagernet/sing-box => github.com/hiddify/hiddify-sing-box v1.8.9-0.20240902030441-17127b0535df
 
 replace github.com/xtls/xray-core => github.com/hiddify/xray-core v0.0.0-20240902024714-0fcb0895bb4b
 
