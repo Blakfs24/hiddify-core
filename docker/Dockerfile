@@ -1,6 +1,6 @@
 FROM alpine:latest
 ENV CONFIG='https://raw.githubusercontent.com/ircfspace/warpsub/main/export/warp#WARP%20(IRCF)'
-ENV VERSION=v2.1.5
+ENV VERSION=v2.3.0
 WORKDIR /hiddify
 RUN apk add  curl tar gzip libc6-compat # iptables ip6tables
 
@@ -15,7 +15,6 @@ RUN apk add  curl tar gzip libc6-compat # iptables ip6tables
         tar -xzf hiddify-cli.tar.gz && rm hiddify-cli.tar.gz
 COPY hiddify.sh .
 RUN chmod +x hiddify.sh
-COPY hiddify.json ./data/
 
 EXPOSE 2334
 EXPOSE 2335
