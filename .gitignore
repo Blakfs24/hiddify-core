@@ -2,8 +2,11 @@
 !/bin/.gitkeep
 .build
 .idea
-
+cert
 **/*.log
 .DS_Store
 
 **/*.syso
+node_modules
+*.db
+*.json

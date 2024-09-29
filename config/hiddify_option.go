@@ -6,9 +6,10 @@ import (
 	dns "github.com/sagernet/sing-dns"
 )
 
-type ConfigOptions struct {
+type HiddifyOptions struct {
 	EnableFullConfig        bool   `json:"enable-full-config"`
 	LogLevel                string `json:"log-level"`
+	LogFile                 string `json:"log-file"`
 	EnableClashApi          bool   `json:"enable-clash-api"`
 	ClashApiPort            uint16 `json:"clash-api-port"`
 	ClashApiSecret          string `json:"web-secret"`
@@ -94,8 +95,8 @@ type WarpOptions struct {
 	Account            WarpAccount
 }
 
-func DefaultConfigOptions() *ConfigOptions {
-	return &ConfigOptions{
+func DefaultHiddifyOptions() *HiddifyOptions {
+	return &HiddifyOptions{
 		DNSOptions: DNSOptions{
 			RemoteDnsAddress:        "1.1.1.1",
 			RemoteDnsDomainStrategy: option.DomainStrategy(dns.DomainStrategyAsIS),
@@ -108,8 +109,8 @@ func DefaultConfigOptions() *ConfigOptions {
 		InboundOptions: InboundOptions{
 			EnableTun:      false,
 			SetSystemProxy: false,
-			MixedPort:      2334,
-			TProxyPort:     2335,
+			MixedPort:      12334,
+			TProxyPort:     12335,
 			LocalDnsPort:   16450,
 			MTU:            9000,
 			StrictRoute:    true,
@@ -126,10 +127,12 @@ func DefaultConfigOptions() *ConfigOptions {
 			BypassLAN:              false,
 			AllowConnectionFromLAN: false,
 		},
-		LogLevel:       "warn",
+		LogLevel: "warn",
+		// LogFile:        "/dev/null",
+		LogFile:        "box.log",
 		Region:         "other",
 		EnableClashApi: true,
-		ClashApiPort:   6756,
+		ClashApiPort:   16756,
 		ClashApiSecret: "",
 		// GeoIPPath:      "geoip.db",
 		// GeoSitePath:    "geosite.db",

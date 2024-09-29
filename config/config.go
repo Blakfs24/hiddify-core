@@ -42,8 +42,7 @@ const (
 
 var OutboundMainProxyTag = OutboundSelectTag
 
-func BuildConfigJson(configOpt ConfigOptions, input option.Options) (string, error) {
-
+func BuildConfigJson(configOpt HiddifyOptions, input option.Options) (string, error) {
 	options, err := BuildConfig(configOpt, input)
 	if err != nil {
 		return "", err
@@ -60,7 +59,7 @@ func BuildConfigJson(configOpt ConfigOptions, input option.Options) (string, err
 }
 
 // TODO include selectors
-func BuildConfig(opt ConfigOptions, input option.Options) (*option.Options, error) {
+func BuildConfig(opt HiddifyOptions, input option.Options) (*option.Options, error) {
 	fmt.Printf("config options: %++v\n", opt)
 
 	var options option.Options
@@ -83,7 +82,8 @@ func BuildConfig(opt ConfigOptions, input option.Options) (*option.Options, erro
 
 	return &options, nil
 }
-func addForceDirect(options *option.Options, opt *ConfigOptions, directDNSDomains map[string]bool) {
+
+func addForceDirect(options *option.Options, opt *HiddifyOptions, directDNSDomains map[string]bool) {
 	remoteDNSAddress := opt.RemoteDnsAddress
 	if strings.Contains(remoteDNSAddress, "://") {
 		remoteDNSAddress = strings.SplitAfter(remoteDNSAddress, "://")[1]
@@ -125,16 +125,15 @@ func addForceDirect(options *option.Options, opt *ConfigOptions, directDNSDomain
 		dnsRule.Server = DNSDirectTag
 		options.DNS.Rules = append([]option.DNSRule{{Type: C.RuleTypeDefault, DefaultOptions: dnsRule}}, options.DNS.Rules...)
 	}
-
 }
 
-func setOutbounds(options *option.Options, input *option.Options, opt *ConfigOptions) error {
+func setOutbounds(options *option.Options, input *option.Options, opt *HiddifyOptions) error {
 	directDNSDomains := make(map[string]bool)
 	var outbounds []option.Outbound
 	var tags []string
 	OutboundMainProxyTag = OutboundSelectTag
-	//inbound==warp over proxies
-	//outbound==proxies over warp
+	// inbound==warp over proxies
+	// outbound==proxies over warp
 	if opt.Warp.EnableWarp {
 		for _, out := range input.Outbounds {
 			if out.Type == C.TypeCustom {
@@ -248,7 +247,7 @@ func setOutbounds(options *option.Options, input *option.Options, opt *ConfigOpt
 				DirectOptions: option.DirectOutboundOptions{
 					DialerOptions: option.DialerOptions{
 						TCPFastOpen: false,
-						TLSFragment: &option.TLSFragmentOptions{
+						TLSFragment: option.TLSFragmentOptions{
 							Enabled: true,
 							Size:    opt.TLSTricks.FragmentSize,
 							Sleep:   opt.TLSTricks.FragmentSleep,
@@ -271,7 +270,7 @@ func setOutbounds(options *option.Options, input *option.Options, opt *ConfigOpt
 	return nil
 }
 
-func setClashAPI(options *option.Options, opt *ConfigOptions) {
+func setClashAPI(options *option.Options, opt *HiddifyOptions) {
 	if opt.EnableClashApi {
 		if opt.ClashApiSecret == "random" {
 			opt.ClashApiSecret = generateRandomString(16)
@@ -290,19 +289,17 @@ func setClashAPI(options *option.Options, opt *ConfigOptions) {
 	}
 }
 
-func setLog(options *option.Options, opt *ConfigOptions) {
+func setLog(options *option.Options, opt *HiddifyOptions) {
 	options.Log = &option.LogOptions{
 		Level:        opt.LogLevel,
-		Output:       "box.log",
+		Output:       opt.LogFile,
 		Disabled:     false,
 		Timestamp:    true,
 		DisableColor: true,
 	}
-
 }
 
-func setInbound(options *option.Options, opt *ConfigOptions) {
-
+func setInbound(options *option.Options, opt *HiddifyOptions) {
 	var inboundDomainStrategy option.DomainStrategy
 	if !opt.ResolveDestination {
 		inboundDomainStrategy = option.DomainStrategy(dns.DomainStrategyAsIS)
@@ -317,7 +314,6 @@ func setInbound(options *option.Options, opt *ConfigOptions) {
 			Tag:  InboundTUNTag,
 
 			TunOptions: option.TunInboundOptions{
-
 				Stack:                  opt.TUNStack,
 				MTU:                    opt.MTU,
 				AutoRoute:              true,
@@ -396,7 +392,7 @@ func setInbound(options *option.Options, opt *ConfigOptions) {
 	)
 }
 
-func setDns(options *option.Options, opt *ConfigOptions) {
+func setDns(options *option.Options, opt *HiddifyOptions) {
 	options.DNS = &option.DNSOptions{
 		StaticIPs: map[string][]string{},
 		DNSClientOptions: option.DNSClientOptions{
@@ -441,7 +437,7 @@ func setDns(options *option.Options, opt *ConfigOptions) {
 	}
 }
 
-func setFakeDns(options *option.Options, opt *ConfigOptions) {
+func setFakeDns(options *option.Options, opt *HiddifyOptions) {
 	if opt.EnableFakeDNS {
 		inet4Range := netip.MustParsePrefix("198.18.0.0/15")
 		inet6Range := netip.MustParsePrefix("fc00::/18")
@@ -473,7 +469,7 @@ func setFakeDns(options *option.Options, opt *ConfigOptions) {
 	}
 }
 
-func setRoutingOptions(options *option.Options, opt *ConfigOptions) {
+func setRoutingOptions(options *option.Options, opt *HiddifyOptions) {
 	dnsRules := []option.DefaultDNSRule{}
 	routeRules := []option.Rule{}
 	rulesets := []option.RuleSet{}
@@ -510,7 +506,6 @@ func setRoutingOptions(options *option.Options, opt *ConfigOptions) {
 		},
 	})
 	routeRules = append(routeRules, option.Rule{
-
 		Type: C.RuleTypeDefault,
 		DefaultOptions: option.DefaultRule{
 			Port:     []uint16{53},
@@ -669,12 +664,14 @@ func setRoutingOptions(options *option.Options, opt *ConfigOptions) {
 			},
 		})
 		dnsRules = append(dnsRules, option.DefaultDNSRule{
-			RuleSet: []string{"geosite-ads",
+			RuleSet: []string{
+				"geosite-ads",
 				"geosite-malware",
 				"geosite-phishing",
 				"geosite-cryptominers",
 				"geoip-malware",
-				"geoip-phishing"},
+				"geoip-phishing",
+			},
 			Server: DNSBlockTag,
 			//		DisableCache: true,
 		})
@@ -757,10 +754,9 @@ func setRoutingOptions(options *option.Options, opt *ConfigOptions) {
 			}
 		}
 	}
-
 }
 
-func patchHiddifyWarpFromConfig(out option.Outbound, opt ConfigOptions) option.Outbound {
+func patchHiddifyWarpFromConfig(out option.Outbound, opt HiddifyOptions) option.Outbound {
 	if opt.Warp.EnableWarp && opt.Warp.Mode == "proxy_over_warp" {
 		if out.DirectOptions.Detour == "" {
 			out.DirectOptions.Detour = "Hiddify Warp ✅"

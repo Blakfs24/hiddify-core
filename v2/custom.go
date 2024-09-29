@@ -17,7 +17,7 @@ import (
 
 var (
 	Box              *libbox.BoxService
-	configOptions    *config.ConfigOptions
+	HiddifyOptions   *config.HiddifyOptions
 	activeConfigPath string
 	coreLogFactory   log.Factory
 	useFlutterBridge bool = true
@@ -67,9 +67,11 @@ func Start(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	resp, err := StartService(in)
 	return resp, err
 }
+
 func (s *CoreService) StartService(ctx context.Context, in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	return StartService(in)
 }
+
 func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	Log(pb.LogLevel_DEBUG, pb.LogType_CORE, "Starting Core Service")
 	content := in.ConfigContent
@@ -81,7 +83,7 @@ func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 			Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
 			resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_ERROR_READING_CONFIG, err.Error())
 			StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
-			return &resp, err
+			return resp, err
 		}
 		content = string(fileContent)
 	}
@@ -94,16 +96,16 @@ func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 		Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
 		resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_ERROR_PARSING_CONFIG, err.Error())
 		StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
-		return &resp, err
+		return resp, err
 	}
 	if !in.EnableRawConfig {
 		Log(pb.LogLevel_DEBUG, pb.LogType_CORE, "Building config")
-		parsedContent_tmp, err := config.BuildConfig(*configOptions, parsedContent)
+		parsedContent_tmp, err := config.BuildConfig(*HiddifyOptions, parsedContent)
 		if err != nil {
 			Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
 			resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_ERROR_BUILDING_CONFIG, err.Error())
 			StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
-			return &resp, err
+			return resp, err
 		}
 		parsedContent = *parsedContent_tmp
 	}
@@ -120,18 +122,17 @@ func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 			Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
 			resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_START_COMMAND_SERVER, err.Error())
 			StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
-			return &resp, err
+			return resp, err
 		}
 	}
 
 	Log(pb.LogLevel_DEBUG, pb.LogType_CORE, "Stating Service ")
 	instance, err := NewService(parsedContent)
-
 	if err != nil {
 		Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
 		resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_CREATE_SERVICE, err.Error())
 		StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
-		return &resp, err
+		return resp, err
 	}
 	Log(pb.LogLevel_DEBUG, pb.LogType_CORE, "Service.. started")
 	if in.DelayStart {
@@ -143,7 +144,7 @@ func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 		Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
 		resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_START_SERVICE, err.Error())
 		StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
-		return &resp, err
+		return resp, err
 	}
 	Box = instance
 	if in.EnableOldCommandServer {
@@ -151,13 +152,13 @@ func StartService(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	}
 
 	resp := SetCoreStatus(pb.CoreState_STARTED, pb.MessageType_EMPTY, "")
-	return &resp, nil
-
+	return resp, nil
 }
 
 func (s *CoreService) Parse(ctx context.Context, in *pb.ParseRequest) (*pb.ParseResponse, error) {
 	return Parse(in)
 }
+
 func Parse(in *pb.ParseRequest) (*pb.ParseResponse, error) {
 	defer config.DeferPanicToError("parse", func(err error) {
 		Log(pb.LogLevel_FATAL, pb.LogType_CONFIG, err.Error())
@@ -175,7 +176,7 @@ func Parse(in *pb.ParseRequest) (*pb.ParseResponse, error) {
 
 	}
 
-	config, err := config.ParseConfigContent(content, true, configOptions, false)
+	config, err := config.ParseConfigContent(content, true, HiddifyOptions, false)
 	if err != nil {
 		return &pb.ParseResponse{
 			ResponseCode: pb.ResponseCode_FAILED,
@@ -183,7 +184,7 @@ func Parse(in *pb.ParseRequest) (*pb.ParseResponse, error) {
 		}, err
 	}
 	if in.ConfigPath != "" {
-		err = os.WriteFile(in.ConfigPath, config, 0644)
+		err = os.WriteFile(in.ConfigPath, config, 0o644)
 		if err != nil {
 			return &pb.ParseResponse{
 				ResponseCode: pb.ResponseCode_FAILED,
@@ -198,42 +199,44 @@ func Parse(in *pb.ParseRequest) (*pb.ParseResponse, error) {
 	}, err
 }
 
-func (s *CoreService) ChangeConfigOptions(ctx context.Context, in *pb.ChangeConfigOptionsRequest) (*pb.CoreInfoResponse, error) {
-	return ChangeConfigOptions(in)
+func (s *CoreService) ChangeHiddifySettings(ctx context.Context, in *pb.ChangeHiddifySettingsRequest) (*pb.CoreInfoResponse, error) {
+	return ChangeHiddifySettings(in)
 }
 
-func ChangeConfigOptions(in *pb.ChangeConfigOptionsRequest) (*pb.CoreInfoResponse, error) {
-	configOptions = &config.ConfigOptions{}
-	err := json.Unmarshal([]byte(in.ConfigOptionsJson), configOptions)
+func ChangeHiddifySettings(in *pb.ChangeHiddifySettingsRequest) (*pb.CoreInfoResponse, error) {
+	HiddifyOptions = config.DefaultHiddifyOptions()
+	err := json.Unmarshal([]byte(in.HiddifySettingsJson), HiddifyOptions)
 	if err != nil {
 		return nil, err
 	}
-	if configOptions.Warp.WireguardConfigStr != "" {
-		err := json.Unmarshal([]byte(configOptions.Warp.WireguardConfigStr), &configOptions.Warp.WireguardConfig)
+	if HiddifyOptions.Warp.WireguardConfigStr != "" {
+		err := json.Unmarshal([]byte(HiddifyOptions.Warp.WireguardConfigStr), &HiddifyOptions.Warp.WireguardConfig)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if configOptions.Warp2.WireguardConfigStr != "" {
-		err := json.Unmarshal([]byte(configOptions.Warp2.WireguardConfigStr), &configOptions.Warp2.WireguardConfig)
+	if HiddifyOptions.Warp2.WireguardConfigStr != "" {
+		err := json.Unmarshal([]byte(HiddifyOptions.Warp2.WireguardConfigStr), &HiddifyOptions.Warp2.WireguardConfig)
 		if err != nil {
 			return nil, err
 		}
 	}
 	return &pb.CoreInfoResponse{}, nil
 }
+
 func (s *CoreService) GenerateConfig(ctx context.Context, in *pb.GenerateConfigRequest) (*pb.GenerateConfigResponse, error) {
 	return GenerateConfig(in)
 }
+
 func GenerateConfig(in *pb.GenerateConfigRequest) (*pb.GenerateConfigResponse, error) {
 	defer config.DeferPanicToError("generateConfig", func(err error) {
 		Log(pb.LogLevel_FATAL, pb.LogType_CONFIG, err.Error())
 		StopAndAlert(pb.MessageType_UNEXPECTED_ERROR, err.Error())
 	})
-	if configOptions == nil {
-		configOptions = config.DefaultConfigOptions()
+	if HiddifyOptions == nil {
+		HiddifyOptions = config.DefaultHiddifyOptions()
 	}
-	config, err := generateConfigFromFile(in.Path, *configOptions)
+	config, err := generateConfigFromFile(in.Path, *HiddifyOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +244,8 @@ func GenerateConfig(in *pb.GenerateConfigRequest) (*pb.GenerateConfigResponse, e
 		ConfigContent: config,
 	}, nil
 }
-func generateConfigFromFile(path string, configOpt config.ConfigOptions) (string, error) {
+
+func generateConfigFromFile(path string, configOpt config.HiddifyOptions) (string, error) {
 	os.Chdir(filepath.Dir(path))
 	content, err := os.ReadFile(path)
 	if err != nil {
@@ -261,6 +265,7 @@ func generateConfigFromFile(path string, configOpt config.ConfigOptions) (string
 func (s *CoreService) Stop(ctx context.Context, empty *pb.Empty) (*pb.CoreInfoResponse, error) {
 	return Stop()
 }
+
 func Stop() (*pb.CoreInfoResponse, error) {
 	defer config.DeferPanicToError("stop", func(err error) {
 		Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())
@@ -309,12 +314,13 @@ func Stop() (*pb.CoreInfoResponse, error) {
 		oldCommandServer = nil
 	}
 	resp := SetCoreStatus(pb.CoreState_STOPPED, pb.MessageType_EMPTY, "")
-	return &resp, nil
-
+	return resp, nil
 }
+
 func (s *CoreService) Restart(ctx context.Context, in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	return Restart(in)
 }
+
 func Restart(in *pb.StartRequest) (*pb.CoreInfoResponse, error) {
 	defer config.DeferPanicToError("restart", func(err error) {
 		Log(pb.LogLevel_FATAL, pb.LogType_CORE, err.Error())

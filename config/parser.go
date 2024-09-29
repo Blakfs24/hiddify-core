@@ -6,9 +6,8 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
-
 	"os"
+	"path/filepath"
 
 	"github.com/hiddify/ray2sing/ray2sing"
 	"github.com/sagernet/sing-box/experimental/libbox"
@@ -31,9 +30,23 @@ func ParseConfig(path string, debug bool) ([]byte, error) {
 	}
 	return ParseConfigContent(string(content), debug, nil, false)
 }
-func ParseConfigContent(contentstr string, debug bool, configOpt *ConfigOptions, fullConfig bool) ([]byte, error) {
+
+func ParseConfigContentToOptions(contentstr string, debug bool, configOpt *HiddifyOptions, fullConfig bool) (*option.Options, error) {
+	content, err := ParseConfigContent(contentstr, debug, configOpt, fullConfig)
+	if err != nil {
+		return nil, err
+	}
+	var options option.Options
+	err = json.Unmarshal(content, &options)
+	if err != nil {
+		return nil, err
+	}
+	return &options, nil
+}
+
+func ParseConfigContent(contentstr string, debug bool, configOpt *HiddifyOptions, fullConfig bool) ([]byte, error) {
 	if configOpt == nil {
-		configOpt = DefaultConfigOptions()
+		configOpt = DefaultHiddifyOptions()
 	}
 	content := []byte(contentstr)
 	var jsonObj map[string]interface{} = make(map[string]interface{})
@@ -51,7 +64,6 @@ func ParseConfigContent(contentstr string, debug bool, configOpt *ConfigOptions,
 				} else {
 					jsonObj["outbounds"] = tmpJsonObj["outbounds"]
 				}
-
 			}
 		} else if jsonArray, ok := tmpJsonResult.([]map[string]interface{}); ok {
 			jsonObj["outbounds"] = jsonArray
@@ -89,7 +101,7 @@ func ParseConfigContent(contentstr string, debug bool, configOpt *ConfigOptions,
 	return nil, fmt.Errorf("unable to determine config format")
 }
 
-func patchConfig(content []byte, name string, configOpt *ConfigOptions) ([]byte, error) {
+func patchConfig(content []byte, name string, configOpt *HiddifyOptions) ([]byte, error) {
 	options := option.Options{}
 	err := json.Unmarshal(content, &options)
 	if err != nil {
@@ -113,7 +125,6 @@ func patchConfig(content []byte, name string, configOpt *ConfigOptions) ([]byte,
 		for i, base := range options.Outbounds {
 			options.Outbounds[i] = *res[base.Tag].Value
 		}
-
 	}
 
 	content, _ = json.MarshalIndent(options, "", "  ")
@@ -123,7 +134,6 @@ func patchConfig(content []byte, name string, configOpt *ConfigOptions) ([]byte,
 }
 
 func validateResult(content []byte, name string) ([]byte, error) {
-
 	err := libbox.CheckConfig(string(content))
 	if err != nil {
 		return nil, fmt.Errorf("[%s] invalid sing-box config: %w", name, err)

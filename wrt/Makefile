@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hiddify-core
-PKG_VERSION:=1.2.0
+PKG_VERSION:=3.0.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/hiddify/hiddify-core/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=481098a29b0b08d225598e5e74eddfe4cbdd4560b7ac74d210dcc923792a3e24
+PKG_HASH:=a9d93109614609034638bc56ce8f5aa5c4f98665784a655e080471cf58a56ae8
 
 PKG_LICENSE:=https://github.com/hiddify/hiddify-next/edit/main/LICENSE.md
 PKG_LICENSE_FILES:=LICENSE
@@ -30,7 +30,7 @@ define Package/hiddify-core
   CATEGORY:=Network
   URL:=https://hiddify.com/
   DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle +kmod-inet-diag +kmod-tun
-  USERID:=hiddify-core=5566:hiddify-core=5566
+  USERID:=hiddify=15566:hiddify=15566
 endef
 
 define Package/hiddify-core/description
@@ -41,23 +41,25 @@ endef
 GO_PKG_TAGS:=with_gvisor,with_quic,with_wireguard,with_ech,with_utls,with_clash_api,with_grpc,with_low_memory,with_conntrack
 
 define Package/hiddify-core/conffiles
-/etc/config/hiddify-core
-/etc/hiddify-core/
+/etc/config/hiddify
+/etc/hiddify/
 endef
 
 define Package/hiddify-core/install
 
 	$(INSTALL_DIR) $(1)/usr/bin/
-	$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/HiddifyCli $(1)/usr/bin/hiddify-cli
-	$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/HiddifyCli $(1)/usr/bin/HiddifyCli
+	$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/cli $(1)/usr/bin/hiddify-cli
 
-	$(INSTALL_DIR) $(1)/etc/hiddify-core
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/release/config/config.json $(1)/etc/hiddify-core
+	$(INSTALL_DIR) $(1)/etc/hiddify
+	$(INSTALL_DATA) ./files/hiddify.json $(1)/etc/hiddify/appconfig.json
 
 	$(INSTALL_DIR) $(1)/etc/config/
-	$(INSTALL_CONF) ./files/hiddify.conf $(1)/etc/config/hiddify-core
+	$(INSTALL_CONF) ./files/hiddify.conf $(1)/etc/config/hiddify
+
 	$(INSTALL_DIR) $(1)/etc/init.d/
-	$(INSTALL_BIN) ./files/hiddify.init $(1)/etc/init.d/hiddify-core
+	$(INSTALL_BIN) ./files/hiddify.init $(1)/etc/init.d/hiddify
+
+	$(CP) ./files/webui $(1)/usr/bin/
 endef
 
 $(eval $(call BuildPackage,hiddify-core))
