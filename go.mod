@@ -4,6 +4,7 @@ go 1.22.5
 
 require (
 	github.com/bepass-org/warp-plus v1.2.4
+	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/hiddify/hiddify-app-example-extension v0.0.0-20240928185410-086adbcac1bb
 	github.com/hiddify/hiddify-ip-scanner-extension v0.0.0-20240928194626-7f6dde034dfe
 	github.com/improbable-eng/grpc-web v0.15.0
@@ -29,6 +30,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/metacubex/tfo-go v0.0.0-20240821025650-e9be0afd5e7d // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rodaine/table v1.1.1 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
@@ -44,7 +46,6 @@ require (
 	github.com/cloudflare/circl v1.4.0 // indirect
 	github.com/cretz/bine v0.2.0 // indirect
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
-	github.com/fatih/color v1.16.0 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gaukas/godicttls v0.0.4 // indirect
@@ -72,8 +73,6 @@ require (
 	github.com/libdns/cloudflare v0.1.1 // indirect
 	github.com/libdns/libdns v0.2.2 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mholt/acmez v1.2.0 // indirect
 	github.com/miekg/dns v1.1.62 // indirect
