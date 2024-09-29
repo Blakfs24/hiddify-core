@@ -153,9 +153,9 @@ func patchOutbound(base option.Outbound, configOpt HiddifyOptions, staticIpsDns 
 			if server != "" && net.ParseIP(server) == nil {
 				serverDomain = fmt.Sprintf("full:%s", server)
 			}
-		}
-		if configOpt.CloudFlareOptions.EnableCloudFlare && cf.IsIPInCloudflareRanges(server) && len(configOpt.CloudFlareOptions.CloudFlareIPs) > 0 {
-			obj["server"] = cf.RandomSelect(configOpt.CloudFlareOptions.CloudFlareIPs, 1)[0]
+			if configOpt.CloudFlareOptions.EnableCloudFlare && cf.IsIPInCloudflareRanges(server) && len(configOpt.CloudFlareOptions.CloudFlareIPs) > 0 {
+				obj["server"] = cf.RandomSelect(configOpt.CloudFlareOptions.CloudFlareIPs, 1)[0]
+			}
 		}
 	}
 
