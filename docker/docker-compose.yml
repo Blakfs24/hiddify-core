@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   hiddify:
-    image: ghcr.io/hiddify/hiddify-next-core/cli:latest
+    image: ghcr.io/hiddify/hiddify-core:latest
     network_mode: host
     environment:
-      CONFIG: "https://raw.githubusercontent.com/ircfspace/warpsub/main/export/warp#WARP%20(IRCF)"
+      CONFIG: "https://github.com/hiddify/hiddify-next/raw/refs/heads/main/test.configs/warp"
     volumes:
       - ./hiddify.json:/hiddify/hiddify.json
     command: ["/opt/hiddify.sh"]
