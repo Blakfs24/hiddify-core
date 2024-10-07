@@ -257,16 +257,16 @@ proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.editExtension =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.hiddifyrpc.ExtensionRequest,
+ *   !proto.hiddifyrpc.SendExtensionDataRequest,
  *   !proto.hiddifyrpc.ExtensionActionResult>}
  */
 const methodDescriptor_ExtensionHostService_SubmitForm = new grpc.web.MethodDescriptor(
   '/hiddifyrpc.ExtensionHostService/SubmitForm',
   grpc.web.MethodType.UNARY,
-  proto.hiddifyrpc.ExtensionRequest,
+  proto.hiddifyrpc.SendExtensionDataRequest,
   proto.hiddifyrpc.ExtensionActionResult,
   /**
-   * @param {!proto.hiddifyrpc.ExtensionRequest} request
+   * @param {!proto.hiddifyrpc.SendExtensionDataRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -277,7 +277,7 @@ const methodDescriptor_ExtensionHostService_SubmitForm = new grpc.web.MethodDesc
 
 
 /**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -298,7 +298,7 @@ proto.hiddifyrpc.ExtensionHostServiceClient.prototype.submitForm =
 
 
 /**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
@@ -321,8 +321,8 @@ proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.submitForm =
  *   !proto.hiddifyrpc.ExtensionRequest,
  *   !proto.hiddifyrpc.ExtensionActionResult>}
  */
-const methodDescriptor_ExtensionHostService_Cancel = new grpc.web.MethodDescriptor(
-  '/hiddifyrpc.ExtensionHostService/Cancel',
+const methodDescriptor_ExtensionHostService_Close = new grpc.web.MethodDescriptor(
+  '/hiddifyrpc.ExtensionHostService/Close',
   grpc.web.MethodType.UNARY,
   proto.hiddifyrpc.ExtensionRequest,
   proto.hiddifyrpc.ExtensionActionResult,
@@ -347,13 +347,13 @@ const methodDescriptor_ExtensionHostService_Cancel = new grpc.web.MethodDescript
  * @return {!grpc.web.ClientReadableStream<!proto.hiddifyrpc.ExtensionActionResult>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.hiddifyrpc.ExtensionHostServiceClient.prototype.cancel =
+proto.hiddifyrpc.ExtensionHostServiceClient.prototype.close =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Cancel',
+      '/hiddifyrpc.ExtensionHostService/Close',
       request,
       metadata || {},
-      methodDescriptor_ExtensionHostService_Cancel,
+      methodDescriptor_ExtensionHostService_Close,
       callback);
 };
 
@@ -366,74 +366,13 @@ proto.hiddifyrpc.ExtensionHostServiceClient.prototype.cancel =
  * @return {!Promise<!proto.hiddifyrpc.ExtensionActionResult>}
  *     Promise that resolves to the response
  */
-proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.cancel =
+proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.close =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Cancel',
+      '/hiddifyrpc.ExtensionHostService/Close',
       request,
       metadata || {},
-      methodDescriptor_ExtensionHostService_Cancel);
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
- *   !proto.hiddifyrpc.ExtensionRequest,
- *   !proto.hiddifyrpc.ExtensionActionResult>}
- */
-const methodDescriptor_ExtensionHostService_Stop = new grpc.web.MethodDescriptor(
-  '/hiddifyrpc.ExtensionHostService/Stop',
-  grpc.web.MethodType.UNARY,
-  proto.hiddifyrpc.ExtensionRequest,
-  proto.hiddifyrpc.ExtensionActionResult,
-  /**
-   * @param {!proto.hiddifyrpc.ExtensionRequest} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.hiddifyrpc.ExtensionActionResult.deserializeBinary
-);
-
-
-/**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.hiddifyrpc.ExtensionActionResult)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.hiddifyrpc.ExtensionActionResult>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.hiddifyrpc.ExtensionHostServiceClient.prototype.stop =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Stop',
-      request,
-      metadata || {},
-      methodDescriptor_ExtensionHostService_Stop,
-      callback);
-};
-
-
-/**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
- *     request proto
- * @param {?Object<string, string>=} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.hiddifyrpc.ExtensionActionResult>}
- *     Promise that resolves to the response
- */
-proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.stop =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Stop',
-      request,
-      metadata || {},
-      methodDescriptor_ExtensionHostService_Stop);
+      methodDescriptor_ExtensionHostService_Close);
 };
 
 

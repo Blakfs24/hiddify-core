@@ -82,6 +82,7 @@ type MuxOptions struct {
 }
 
 type WarpOptions struct {
+	Id                 string              `json:"id"`
 	EnableWarp         bool                `json:"enable"`
 	Mode               string              `json:"mode"`
 	WireguardConfigStr string              `json:"wireguard-config"`

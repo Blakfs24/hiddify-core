@@ -21,11 +21,14 @@ const (
 	FieldCheckbox       string = "Checkbox"
 	FieldRadioButton    string = "RadioButton"
 	FieldConsole        string = "Console"
+	FieldButton         string = "Button"
 	ValidatorDigitsOnly string = "digitsOnly"
 
-	Button_Ok     string = "Ok"
-	Button_Submit string = "Submit"
-	Button_Cancel string = "Cancel"
+	ButtonSubmit string = "Submit"
+	ButtonCancel string = "Cancel"
+
+	ButtonDialogClose string = "CloseDialog"
+	ButtonDialogOk    string = "OkDialog"
 )
 
 // FormField extends GenericField with additional common properties.
@@ -59,10 +62,10 @@ type SelectItem struct {
 }
 
 type Form struct {
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Fields      []FormField `json:"fields"`
-	Buttons     []string    `json:"buttons"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
+	Fields      [][]FormField `json:"fields"`
+	// Buttons     []string      `json:"buttons"`
 }
 
 func (f *Form) ToJSON() string {
@@ -71,6 +74,7 @@ func (f *Form) ToJSON() string {
 		fmt.Println("Error encoding to JSON:", err)
 		return ""
 	}
+
 	return (string(formJson))
 }
 

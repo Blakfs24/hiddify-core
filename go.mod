@@ -5,7 +5,8 @@ go 1.22.5
 require (
 	github.com/bepass-org/warp-plus v1.2.4
 	github.com/fatih/color v1.16.0 // indirect
-	github.com/hiddify/hiddify-ip-scanner-extension v0.0.0-20240929171529-e72be5930514
+	github.com/hiddify/hiddify-app-demo-extension v0.0.0-20241001070003-26039f960ad6
+	github.com/hiddify/hiddify-ip-scanner-extension v0.0.0-20241001070353-7ffd688b96b2
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jellydator/validation v1.1.0
 	github.com/kardianos/service v1.2.2
@@ -22,20 +23,30 @@ require (
 )
 
 require (
-	github.com/cheggaaa/pb/v3 v3.1.5
-	github.com/hiddify/hiddify-app-demo-extension v0.0.0-20240929132536-e158b83e958c
+	github.com/Yiwen-Chan/tinydb v0.0.0-20230129042445-3321642f0674
+	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
+	github.com/tendermint/tm-db v0.6.7
 )
 
 require (
+	github.com/DataDog/zstd v1.4.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
+	github.com/cespare/xxhash v1.1.0 // indirect
+	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
+	github.com/dgraph-io/badger/v2 v2.2007.2 // indirect
+	github.com/dgraph-io/ristretto v0.0.3-0.20200630154024-f66de99634de // indirect
+	github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 // indirect
+	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/golang/snappy v0.0.1 // indirect
+	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/metacubex/tfo-go v0.0.0-20240821025650-e9be0afd5e7d // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rodaine/table v1.1.1 // indirect
 	github.com/rs/cors v1.7.0 // indirect
+	go.etcd.io/bbolt v1.3.6 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 )
@@ -97,7 +108,7 @@ require (
 	github.com/quic-go/quic-go v0.46.0 // indirect
 	github.com/refraction-networking/utls v1.6.7 // indirect
 	github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3 // indirect
-	github.com/sagernet/bbolt v0.0.0-20231014093535-ea5cb2fe9f0a
+	github.com/sagernet/bbolt v0.0.0-20231014093535-ea5cb2fe9f0a // indirect
 	github.com/sagernet/cloudflare-tls v0.0.0-20231208171750-a4483c1b7cd1 // indirect
 	github.com/sagernet/gvisor v0.0.0-20240428053021-e691de28565f // indirect
 	github.com/sagernet/netlink v0.0.0-20240523065131-45e60152f9ba // indirect

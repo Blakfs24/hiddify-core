@@ -1,10 +1,12 @@
 package extension
 
 import (
+	"encoding/json"
+
 	"github.com/hiddify/hiddify-core/config"
 	"github.com/hiddify/hiddify-core/extension/ui"
 	pb "github.com/hiddify/hiddify-core/hiddifyrpc"
-	"github.com/hiddify/hiddify-core/v2/common"
+	"github.com/hiddify/hiddify-core/v2/db"
 	"github.com/jellydator/validation"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
@@ -12,9 +14,8 @@ import (
 
 type Extension interface {
 	GetUI() ui.Form
-	SubmitData(data map[string]string) error
-	Cancel() error
-	Stop() error
+	SubmitData(button string, data map[string]string) error
+	Close() error
 	UpdateUI(form ui.Form) error
 
 	BeforeAppConnect(hiddifySettings *config.HiddifyOptions, singconfig *option.Options) error
@@ -41,13 +42,42 @@ func (b *Base[T]) BeforeAppConnect(hiddifySettings *config.HiddifyOptions, singc
 }
 
 func (b *Base[T]) StoreData() {
-	common.Storage.SaveExtensionData(b.id, &b.Data)
+	table := db.GetTable[extensionData]()
+	ed, err := table.Get(b.id)
+	if err != nil {
+		log.Warn("error: ", err)
+		return
+	}
+	res, err := json.Marshal(b.Data)
+	if err != nil {
+		log.Warn("error: ", err)
+		return
+	}
+	ed.JsonData = (res)
+	table.UpdateInsert(ed)
 }
 
 func (b *Base[T]) init(id string) {
 	b.id = id
 	b.queue = make(chan *pb.ExtensionResponse, 1)
-	common.Storage.GetExtensionData(b.id, &b.Data)
+	table := db.GetTable[extensionData]()
+	extdata, err := table.Get(b.id)
+	if err != nil {
+		log.Warn("error: ", err)
+		return
+	}
+	if extdata == nil {
+		log.Warn("extension data not found ", id)
+		return
+	}
+	if extdata.JsonData != nil {
+		var t T
+		if err := json.Unmarshal(extdata.JsonData, &t); err != nil {
+			log.Warn("error loading data of ", id, " : ", err)
+		} else {
+			b.Data = t
+		}
+	}
 }
 
 func (b *Base[T]) getQueue() chan *pb.ExtensionResponse {
@@ -62,7 +92,14 @@ func (e *Base[T]) ShowMessage(title string, msg string) error {
 	return e.ShowDialog(ui.Form{
 		Title:       title,
 		Description: msg,
-		Buttons:     []string{ui.Button_Ok},
+		Fields: [][]ui.FormField{
+			{{
+				Type:  ui.FieldButton,
+				Key:   ui.ButtonDialogOk,
+				Label: "Ok",
+			}},
+		},
+		// Buttons:     []string{ui.Button_Ok},
 	})
 }
 

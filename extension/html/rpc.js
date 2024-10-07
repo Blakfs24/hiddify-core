@@ -686,12 +686,12 @@ const extension = require("./extension_grpc_web_pb.js");
 
 const { renderForm } = require('./formRenderer.js');
 const { listExtensions } = require('./extensionList.js');
-var currentExtensionId=undefined;
+var currentExtensionId = undefined;
 function openExtensionPage(extensionId) {
-    currentExtensionId=extensionId;
-        $("#extension-list-container").hide();
-        $("#extension-page-container").show();
-        $("#connection-page").hide();
+    currentExtensionId = extensionId;
+    $("#extension-list-container").hide();
+    $("#extension-page-container").show();
+    $("#connection-page").hide();
     connect()
 }
 
@@ -700,42 +700,45 @@ function connect() {
     request.setExtensionId(currentExtensionId);
 
     const stream = extensionClient.connect(request, {});
-    
+
     stream.on('data', (response) => {
-        console.log('Receving ',response);
+        console.log('Receiving ', response);
         if (response.getExtensionId() === currentExtensionId) {
-            ui=JSON.parse(response.getJsonUi())
-            if(response.getType()== proto.hiddifyrpc.ExtensionResponseType.SHOW_DIALOG) {
-                renderForm(ui, "dialog",handleSubmitButtonClick,handleCancelButtonClick,undefined);
-            }else{
-                renderForm(ui, "",handleSubmitButtonClick,handleCancelButtonClick);
+            ui = JSON.parse(response.getJsonUi())
+            if (response.getType() == proto.hiddifyrpc.ExtensionResponseType.SHOW_DIALOG) {
+                renderForm(ui, "dialog", handleSubmitButtonClick, undefined);
+            } else {
+                renderForm(ui, "", handleSubmitButtonClick, handleStopButtonClick);
             }
 
-            
+
         }
     });
-    
+
     stream.on('error', (err) => {
         console.error('Error opening extension page:', err);
         // openExtensionPage(extensionId);
     });
-    
+
     stream.on('end', () => {
         console.log('Stream ended');
         setTimeout(connect, 1000);
-        
+
     });
 }
 
-async function handleSubmitButtonClick(event) {
+async function handleSubmitButtonClick(event, button) {
     event.preventDefault();
     bootstrap.Modal.getOrCreateInstance("#extension-dialog").hide();
-    const formData = new FormData(event.target.closest('form'));
-    const request = new extension.ExtensionRequest();
-    const datamap=request.getDataMap()
-    formData.forEach((value, key) => {
-        datamap.set(key,value);
-    });
+    const request = new extension.SendExtensionDataRequest();
+    request.setButton(button);
+    if (event.type != 'hidden.bs.modal') {
+        const formData = new FormData(event.target.closest('form'));
+        const datamap = request.getDataMap()
+        formData.forEach((value, key) => {
+            datamap.set(key, value);
+        });
+    }
     request.setExtensionId(currentExtensionId);
 
     try {
@@ -746,28 +749,14 @@ async function handleSubmitButtonClick(event) {
     }
 }
 
-async function handleCancelButtonClick(event) {
-    event.preventDefault();
-    const request = new extension.ExtensionRequest();
-    request.setExtensionId(currentExtensionId);
-
-    try {
-        bootstrap.Modal.getOrCreateInstance("#extension-dialog").hide();
-            
-        await extensionClient.cancel(request, {});
-        console.log('Extension cancelled successfully.');
-    } catch (err) {
-        console.error('Error cancelling extension:', err);
-    }
-}
 
 async function handleStopButtonClick(event) {
     event.preventDefault();
     const request = new extension.ExtensionRequest();
     request.setExtensionId(currentExtensionId);
-
+    bootstrap.Modal.getOrCreateInstance("#extension-dialog").hide();
     try {
-        await extensionClient.stop(request, {});
+        await extensionClient.close(request, {});
         console.log('Extension stopped successfully.');
         currentExtensionId = undefined;
         listExtensions(); // Return to the extension list
@@ -1039,16 +1028,16 @@ proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.editExtension =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.hiddifyrpc.ExtensionRequest,
+ *   !proto.hiddifyrpc.SendExtensionDataRequest,
  *   !proto.hiddifyrpc.ExtensionActionResult>}
  */
 const methodDescriptor_ExtensionHostService_SubmitForm = new grpc.web.MethodDescriptor(
   '/hiddifyrpc.ExtensionHostService/SubmitForm',
   grpc.web.MethodType.UNARY,
-  proto.hiddifyrpc.ExtensionRequest,
+  proto.hiddifyrpc.SendExtensionDataRequest,
   proto.hiddifyrpc.ExtensionActionResult,
   /**
-   * @param {!proto.hiddifyrpc.ExtensionRequest} request
+   * @param {!proto.hiddifyrpc.SendExtensionDataRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -1059,7 +1048,7 @@ const methodDescriptor_ExtensionHostService_SubmitForm = new grpc.web.MethodDesc
 
 
 /**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -1080,7 +1069,7 @@ proto.hiddifyrpc.ExtensionHostServiceClient.prototype.submitForm =
 
 
 /**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
@@ -1103,8 +1092,8 @@ proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.submitForm =
  *   !proto.hiddifyrpc.ExtensionRequest,
  *   !proto.hiddifyrpc.ExtensionActionResult>}
  */
-const methodDescriptor_ExtensionHostService_Cancel = new grpc.web.MethodDescriptor(
-  '/hiddifyrpc.ExtensionHostService/Cancel',
+const methodDescriptor_ExtensionHostService_Close = new grpc.web.MethodDescriptor(
+  '/hiddifyrpc.ExtensionHostService/Close',
   grpc.web.MethodType.UNARY,
   proto.hiddifyrpc.ExtensionRequest,
   proto.hiddifyrpc.ExtensionActionResult,
@@ -1129,13 +1118,13 @@ const methodDescriptor_ExtensionHostService_Cancel = new grpc.web.MethodDescript
  * @return {!grpc.web.ClientReadableStream<!proto.hiddifyrpc.ExtensionActionResult>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.hiddifyrpc.ExtensionHostServiceClient.prototype.cancel =
+proto.hiddifyrpc.ExtensionHostServiceClient.prototype.close =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Cancel',
+      '/hiddifyrpc.ExtensionHostService/Close',
       request,
       metadata || {},
-      methodDescriptor_ExtensionHostService_Cancel,
+      methodDescriptor_ExtensionHostService_Close,
       callback);
 };
 
@@ -1148,74 +1137,13 @@ proto.hiddifyrpc.ExtensionHostServiceClient.prototype.cancel =
  * @return {!Promise<!proto.hiddifyrpc.ExtensionActionResult>}
  *     Promise that resolves to the response
  */
-proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.cancel =
+proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.close =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Cancel',
+      '/hiddifyrpc.ExtensionHostService/Close',
       request,
       metadata || {},
-      methodDescriptor_ExtensionHostService_Cancel);
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
- *   !proto.hiddifyrpc.ExtensionRequest,
- *   !proto.hiddifyrpc.ExtensionActionResult>}
- */
-const methodDescriptor_ExtensionHostService_Stop = new grpc.web.MethodDescriptor(
-  '/hiddifyrpc.ExtensionHostService/Stop',
-  grpc.web.MethodType.UNARY,
-  proto.hiddifyrpc.ExtensionRequest,
-  proto.hiddifyrpc.ExtensionActionResult,
-  /**
-   * @param {!proto.hiddifyrpc.ExtensionRequest} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.hiddifyrpc.ExtensionActionResult.deserializeBinary
-);
-
-
-/**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.hiddifyrpc.ExtensionActionResult)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.hiddifyrpc.ExtensionActionResult>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.hiddifyrpc.ExtensionHostServiceClient.prototype.stop =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Stop',
-      request,
-      metadata || {},
-      methodDescriptor_ExtensionHostService_Stop,
-      callback);
-};
-
-
-/**
- * @param {!proto.hiddifyrpc.ExtensionRequest} request The
- *     request proto
- * @param {?Object<string, string>=} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.hiddifyrpc.ExtensionActionResult>}
- *     Promise that resolves to the response
- */
-proto.hiddifyrpc.ExtensionHostServicePromiseClient.prototype.stop =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/hiddifyrpc.ExtensionHostService/Stop',
-      request,
-      metadata || {},
-      methodDescriptor_ExtensionHostService_Stop);
+      methodDescriptor_ExtensionHostService_Close);
 };
 
 
@@ -1316,6 +1244,7 @@ goog.exportSymbol('proto.hiddifyrpc.ExtensionList', null, global);
 goog.exportSymbol('proto.hiddifyrpc.ExtensionRequest', null, global);
 goog.exportSymbol('proto.hiddifyrpc.ExtensionResponse', null, global);
 goog.exportSymbol('proto.hiddifyrpc.ExtensionResponseType', null, global);
+goog.exportSymbol('proto.hiddifyrpc.SendExtensionDataRequest', null, global);
 /**
  * Generated by JsPbCodeGenerator.
  * @param {Array=} opt_data Optional initial data array, typically from a
@@ -1420,6 +1349,27 @@ if (goog.DEBUG && !COMPILED) {
    * @override
    */
   proto.hiddifyrpc.ExtensionRequest.displayName = 'proto.hiddifyrpc.ExtensionRequest';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.hiddifyrpc.SendExtensionDataRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.hiddifyrpc.SendExtensionDataRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.hiddifyrpc.SendExtensionDataRequest.displayName = 'proto.hiddifyrpc.SendExtensionDataRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -2352,6 +2302,200 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.hiddifyrpc.SendExtensionDataRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+extensionId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+button: jspb.Message.getFieldWithDefault(msg, 2, ""),
+dataMap: (f = msg.getDataMap()) ? f.toObject(includeInstance, undefined) : []
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.hiddifyrpc.SendExtensionDataRequest}
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.hiddifyrpc.SendExtensionDataRequest;
+  return proto.hiddifyrpc.SendExtensionDataRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.hiddifyrpc.SendExtensionDataRequest}
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setExtensionId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setButton(value);
+      break;
+    case 3:
+      var value = msg.getDataMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readString, null, "", "");
+         });
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.hiddifyrpc.SendExtensionDataRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.hiddifyrpc.SendExtensionDataRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getExtensionId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getButton();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getDataMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
+  }
+};
+
+
+/**
+ * optional string extension_id = 1;
+ * @return {string}
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.getExtensionId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.hiddifyrpc.SendExtensionDataRequest} returns this
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.setExtensionId = function(value) {
+  return jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string button = 2;
+ * @return {string}
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.getButton = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.hiddifyrpc.SendExtensionDataRequest} returns this
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.setButton = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * map<string, string> data = 3;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,string>}
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.getDataMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,string>} */ (
+      jspb.Message.getMapField(this, 3, opt_noLazyCreate,
+      null));
+};
+
+
+/**
+ * Clears values from the map. The map will be non-null.
+ * @return {!proto.hiddifyrpc.SendExtensionDataRequest} returns this
+ */
+proto.hiddifyrpc.SendExtensionDataRequest.prototype.clearDataMap = function() {
+  this.getDataMap().clear();
+  return this;
+};
+
+
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
 proto.hiddifyrpc.ExtensionResponse.prototype.toObject = function(opt_includeInstance) {
   return proto.hiddifyrpc.ExtensionResponse.toObject(opt_includeInstance, this);
 };
@@ -2546,7 +2690,7 @@ const ansi_up = new AnsiUp({
 });
 
 
-function renderForm(json, dialog, submitAction, cancelAction, stopAction) {
+function renderForm(json, dialog, submitAction, stopAction) {
     const container = document.getElementById(`extension-page-container${dialog}`);
     const formId = `dynamicForm${json.id}${dialog}`;
 
@@ -2562,32 +2706,32 @@ function renderForm(json, dialog, submitAction, cancelAction, stopAction) {
         document.getElementById("modalLabel").textContent = json.title;
     } else {
         const titleElement = createTitleElement(json);
-        if (stopAction != undefined) {
-            const stopButton = document.createElement('button');
-            stopButton.textContent = "Back";
-            stopButton.classList.add('btn', 'btn-danger');
-            stopButton.addEventListener('click', stopAction);
-            form.appendChild(stopButton);
-        }
+        const stopBtn = document.createElement('button');
+        stopBtn.type = 'button';
+        stopBtn.className = 'btn btn-danger';
+        stopBtn.textContent = 'Close';
+        stopBtn.addEventListener('click', stopAction);
+        form.appendChild(stopBtn);
         form.appendChild(titleElement);
     }
-    addElementsToForm(form, json);
-    const buttonGroup = createButtonGroup(json, submitAction, cancelAction);
+    addElementsToForm(form, json,submitAction);
+
     if (dialog === "dialog") {
         document.getElementById("modal-footer").innerHTML = '';
-        document.getElementById("modal-footer").appendChild(buttonGroup);
-        const dialog = bootstrap.Modal.getOrCreateInstance("#extension-dialog");
-        dialog.show()
-        dialog.on("hidden.bs.modal", () => {
-            cancelAction()
-        })
-    } else {
-        form.appendChild(buttonGroup);
+        // if ($(form.lastChild).find("button").length > 0) {
+            
+        //     document.getElementById("modal-footer").appendChild(form.lastChild);
+            
+        // }
+        const extensionDialog = document.getElementById("extension-dialog");
+        const dialog = bootstrap.Modal.getOrCreateInstance(extensionDialog);
+        dialog.show();
+        extensionDialog.addEventListener("hidden.bs.modal", (e)=>submitAction(e,"CloseDialog"));
     }
 
 }
 
-function addElementsToForm(form, json) {
+function addElementsToForm(form, json,submitAction) {
 
 
 
@@ -2596,8 +2740,14 @@ function addElementsToForm(form, json) {
     form.appendChild(description);
     if (json.fields) {
         json.fields.forEach(field => {
-            const formGroup = createFormGroup(field);
-            form.appendChild(formGroup);
+            div=document.createElement("div")
+            div.classList.add("row")
+            form.appendChild(div)
+            for (let i = 0; i < field.length; i++) {
+                const formGroup = createFormGroup(field[i], submitAction);
+                formGroup.classList.add("col")
+                div.appendChild(formGroup);
+            }
         });
     }
 
@@ -2610,19 +2760,35 @@ function createTitleElement(json) {
     return title;
 }
 
-function createFormGroup(field) {
+function createFormGroup(field, submitAction) {
     const formGroup = document.createElement('div');
     formGroup.classList.add('mb-3');
+    if (field.type == "Button") {
+        const button = document.createElement('button');
+        button.textContent = field.label;
+        button.name=field.key
+        button.classList.add('btn');
+        if (field.key == "Submit") {
+            button.classList.add('btn-primary');
+        } else if (field.key == "Cancel") {
+            button.classList.add('btn-secondary');
+        }else{
+            button.classList.add('btn', 'btn-outline-secondary');
+        }
+        
+        button.addEventListener('click', (e) => submitAction(e,field.key));
+        formGroup.appendChild(button);
+    } else {
+        if (field.label && !field.labelHidden) {
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            label.setAttribute('for', field.key);
+            formGroup.appendChild(label);
+        }
 
-    if (field.label && !field.labelHidden) {
-        const label = document.createElement('label');
-        label.textContent = field.label;
-        label.setAttribute('for', field.key);
-        formGroup.appendChild(label);
+        const input = createInputElement(field);
+        formGroup.appendChild(input);
     }
-
-    const input = createInputElement(field);
-    formGroup.appendChild(input);
     return formGroup;
 }
 
@@ -2735,18 +2901,18 @@ function createButtonGroup(json, submitAction, cancelAction) {
     buttonGroup.classList.add('btn-group');
     json.buttons.forEach(buttonText => {
         const btn = document.createElement('button');
-        btn.classList.add('btn',"btn-default");
+        btn.classList.add('btn', "btn-default");
         buttonGroup.appendChild(btn);
         btn.textContent = buttonText
-        if (buttonText=="Cancel") {
-            btn.classList.add( 'btn-secondary');
+        if (buttonText == "Cancel") {
+            btn.classList.add('btn-secondary');
             btn.addEventListener('click', cancelAction);
-        }else{
-            if (buttonText=="Submit"||buttonText=="Ok")
+        } else {
+            if (buttonText == "Submit" || buttonText == "Ok")
                 btn.classList.add('btn-primary');
             btn.addEventListener('click', submitAction);
         }
-        
+
     })
 
 
