@@ -179,6 +179,7 @@ require (
 
 require (
 	github.com/cheggaaa/pb/v3 v3.1.5
+	github.com/google/uuid v1.6.0
 	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
 	github.com/tendermint/tm-db v0.6.7
 )
@@ -200,7 +201,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/metacubex/tfo-go v0.0.0-20240821025650-e9be0afd5e7d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rodaine/table v1.1.1 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
