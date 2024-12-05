@@ -72,11 +72,11 @@ func BuildConfig(opt HiddifyOptions, input option.Options) (*option.Options, err
 	setLog(&options, &opt)
 	setInbound(&options, &opt)
 	setDns(&options, &opt)
-	setRoutingOptions(&options, &opt)
 	err := setOutbounds(&options, &input, &opt)
 	if err != nil {
 		return nil, err
 	}
+	setRoutingOptions(&options, &opt)
 	setFakeDns(&options, &opt)
 	addForceDirect(&options, &opt)
 
@@ -102,6 +102,8 @@ func setOutbounds(options *option.Options, input *option.Options, opt *HiddifyOp
 	// outbound==proxies over warp
 	if opt.Warp.EnableWarp {
 		for _, out := range input.Outbounds {
+			// strs, _ := out.MarshalJSON()
+			// fmt.Println(string(strs))
 			if out.Type == C.TypeCustom {
 				if warp, ok := out.CustomOptions["warp"].(map[string]interface{}); ok {
 					key, _ := warp["key"].(string)
@@ -117,6 +119,7 @@ func setOutbounds(options *option.Options, input *option.Options, opt *HiddifyOp
 			}
 		}
 	}
+	// fmt.Println(opt.Warp.EnableWarp)
 	if opt.Warp.EnableWarp && (opt.Warp.Mode == "warp_over_proxy" || opt.Warp.Mode == "proxy_over_warp") {
 		out, err := GenerateWarpSingbox(opt.Warp.WireguardConfig, opt.Warp.CleanIP, opt.Warp.CleanPort, opt.Warp.FakePackets, opt.Warp.FakePacketSize, opt.Warp.FakePacketDelay, opt.Warp.FakePacketMode)
 		if err != nil {
@@ -129,7 +132,15 @@ func setOutbounds(options *option.Options, input *option.Options, opt *HiddifyOp
 		} else {
 			out.WireGuardOptions.Detour = OutboundDirectTag
 		}
-		patchWarp(out, opt, true, nil)
+		// strs, _ := out.MarshalJSON()
+		// fmt.Println("before patch", string(strs))
+		err = patchWarp(out, opt, true, nil)
+		if err != nil {
+			fmt.Println("failed to patch warp config: ", err)
+			return fmt.Errorf("failed to patch warp config: %v", err)
+		}
+		// strs, _ = out.MarshalJsSON()
+		// fmt.Println("after patch", OutboundMainProxyTag)
 		outbounds = append(outbounds, *out)
 		// tags = append(tags, out.Tag)
 	}

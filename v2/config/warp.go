@@ -224,29 +224,46 @@ func patchWarp(base *option.Outbound, configOpt *HiddifyOptions, final bool, sta
 			base.WireGuardOptions = warpOutbound.WireGuardOptions
 		}
 	}
-
+	fmt.Println(base.Type)
 	if final && base.Type == C.TypeWireGuard {
-		host := base.WireGuardOptions.Server
+		// Check if WireGuardOptions is nil
+		// if base.WireGuardOptions == nil {
+		// 	return fmt.Errorf("WireGuardOptions is nil")
+		// }
 
+		host := base.WireGuardOptions.Server
 		if host == "default" || host == "random" || host == "auto" || host == "auto4" || host == "auto6" || isBlockedDomain(host) {
-			// if base.WireGuardOptions.Detour != "" {
-			// 	base.WireGuardOptions.Server = "162.159.192.1"
-			// } else {
-			rndDomain := strings.ToLower(generateRandomString(20))
+			// Generate random domain name
+			rndDomain := generateRandomString(20)
+			rndDomain = strings.ToLower(rndDomain)
+
 			staticIpsDns[rndDomain] = []string{}
-			if host != "auto4" {
-				if host == "auto6" { //|| common.u.CanConnectIPv6() {
-					randomIpPort, _ := warp.RandomWarpEndpoint(false, true)
-					staticIpsDns[rndDomain] = append(staticIpsDns[rndDomain], randomIpPort.Addr().String())
+			switch host {
+			case "auto4":
+				randomIpPort, err := warp.RandomWarpEndpoint(true, false)
+				if err != nil {
+					return fmt.Errorf("failed to get IPv4 endpoint: %v", err)
 				}
-			}
-			if host != "auto6" {
-				randomIpPort, _ := warp.RandomWarpEndpoint(true, false)
+				fmt.Println(randomIpPort.Addr().String())
+				staticIpsDns[rndDomain] = append(staticIpsDns[rndDomain], randomIpPort.Addr().String())
+			case "auto6":
+				randomIpPort, err := warp.RandomWarpEndpoint(false, true)
+				if err != nil {
+					return fmt.Errorf("failed to get IPv6 endpoint: %v", err)
+				}
+				fmt.Println(randomIpPort.Addr().String())
+				staticIpsDns[rndDomain] = append(staticIpsDns[rndDomain], randomIpPort.Addr().String())
+			default:
+				randomIpPort, err := warp.RandomWarpEndpoint(true, false)
+				if err != nil {
+					return fmt.Errorf("failed to get IPv4 endpoint: %v", err)
+				}
+				fmt.Println(randomIpPort.Addr().String())
 				staticIpsDns[rndDomain] = append(staticIpsDns[rndDomain], randomIpPort.Addr().String())
 			}
-			base.WireGuardOptions.Server = rndDomain
-			// }
+			base.WireGuardOptions.Server = staticIpsDns[rndDomain][0]
 		}
+
 		if base.WireGuardOptions.ServerPort == 0 {
 			port := warp.RandomWarpPort()
 			base.WireGuardOptions.ServerPort = port
@@ -260,10 +277,6 @@ func patchWarp(base *option.Outbound, configOpt *HiddifyOptions, final bool, sta
 			base.WireGuardOptions.FakePacketsDelay = ""
 			base.WireGuardOptions.FakePacketsSize = ""
 		}
-		// if base.WireGuardOptions.Detour == "" {
-		// 	base.WireGuardOptions.GSO = runtime.GOOS != "windows"
-		// }
 	}
-
 	return nil
 }
