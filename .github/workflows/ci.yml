@@ -10,12 +10,14 @@ on:
     branches:
        - main
        - dev
-       - v3
+       - android-fix-action-bug
+       - vv3
     paths-ignore:
       - '**.md'
       - 'docs/**'
       - '.vscode/'
       - 'appcast.xml'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
